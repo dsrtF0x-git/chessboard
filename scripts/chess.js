@@ -1,8 +1,8 @@
 const Chess = {
-  newGame() {
+  newGame(initGame) {
     this.startPosition = null;
     this.endPosition = null;
-    this.board = new this.Board();
+    this.board = new this.Board(initGame);
     this.display = new this.Display(this.board);
     this.bKing = this.board.grid[0][4];
     this.wKing = this.board.grid[7][4];
@@ -26,10 +26,11 @@ const Chess = {
     this.display.render(piece);
   },
 
-  move() {
-    if (this.board.move(this.startPosition, this.endPosition)) {
+  move(startPosition, endPosition) {
+    if (this.board.move(startPosition, endPosition)) {
       this.reverseIfInCheck(this.changeTurns.bind(this));
       this.gameOver();
+      // Check gameover algo
     }
     this.startPosition = null;
     this.endPosition = null;
@@ -37,6 +38,9 @@ const Chess = {
 
   changeTurns() {
     this.currentTurn = this.currentTurn === "white" ? "black" : "white";
+    [...document.querySelectorAll(".player-name")].forEach(item => {
+      item.classList.toggle("current-turn");
+    });
   },
 
   reverseIfInCheck(callback) {
@@ -51,10 +55,15 @@ const Chess = {
   },
 
   gameOver() {
+    console.log("Chess: gameover")
     if (this.currentTurn === "white") {
-      if (this.wKing.checkmate()) this.display.showWinner("Black");
+      if (this.wKing.checkmate()) {
+        this.display.showWinner(document.querySelectorAll(".player-name")[0].textContent);
+      }
     } else {
-      if (this.bKing.checkmate()) this.display.showWinner("White");
+      if (this.bKing.checkmate()) {
+        this.display.showWinner(document.querySelectorAll(".player-name")[1].textContent);
+      }
     }
   }
 }

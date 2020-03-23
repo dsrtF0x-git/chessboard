@@ -1,0 +1,74 @@
+$chess-board-size: 600px;
+
+.wrapper {
+  display: flex;
+  justify-content: center;
+}
+
+.board-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-right: 30px;
+
+  .player-info {
+    width: $chess-board-size;
+    display: flex;
+    justify-content: space-between;
+
+    .player-name.current-turn::after {
+      content: "";
+      display: inline-block;
+      margin-left: 5px;
+      background-color: green;
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+    }
+  }
+
+  #chessboard {
+    width: $chess-board-size;
+    height: $chess-board-size;
+    border: 1px solid black;
+    margin: 15px auto;
+
+    .green, .brown, .white {
+      text-align: center;
+      font-size: $chess-board-size / 8 - 10px;
+      line-height: $chess-board-size / 8;
+      float: left;
+      cursor: pointer;
+    }
+
+    .brown, .white {
+      width: $chess-board-size / 8;
+      height: $chess-board-size / 8;
+    }
+
+    .brown {
+      background: orangered;
+    }
+    
+    .white {
+      background: white;
+    }
+    
+    .green {
+      background: green;
+      width: $chess-board-size / 8 - 2px;
+      height: $chess-board-size / 8 - 2px;
+      border: 1px solid black;
+    }
+  }
+}
+
+.selected-piece {
+  color: blue;
+}
+
+.group:after {
+  display: block;
+  content: "";
+  clear: both;
+}

@@ -27,6 +27,7 @@ Chess.Piece.prototype.availableMoves = function() {
 };
 
 Chess.Piece.prototype.validMove = function(startPosition, endPosition) {
+  console.log("valid move")
   if (this.board.getPiece(endPosition) !== null && this.color === this.board.getPiece(endPosition).color) return false;
   if (this.board.getPiece(startPosition) instanceof Chess.Knight) return true;
   if (this.collisionCheck(startPosition, endPosition) === false) return false;
@@ -197,7 +198,6 @@ Chess.King.prototype.checkmate = function() {
 };
 
 Chess.King.prototype.inCheck = function(position) {
-  console.log("incheck")
   let piece;
   if (typeof position === "undefined") position = this.currentPosition;
 
@@ -232,6 +232,7 @@ Chess.King.prototype.didCastle = function(lastPosition) {
 };
 
 Chess.King.prototype.checkIfCastleMove = function(endPosition) {
+  console.log("Check king moves")
   const castlingDirection = this.castlingDirection();
   if (this.color === "white" && Chess.Util._arrayEquals(endPosition, [7, 2]) && castlingDirection[0]) {
     return true;
@@ -356,7 +357,6 @@ Chess.Pawn.prototype.validMove = function(startPosition, endPosition) {
         b = startPosition[1],
         x = endPosition[0],
         y = endPosition[1];
-
   if (this.board.grid[x][y] !== null && b === y) return false;
 
   if (this.color === "white" && a === 6 && y === b && Math.abs(x - a) === 2 && this.board.getPiece([a - 1, b]) === null) {

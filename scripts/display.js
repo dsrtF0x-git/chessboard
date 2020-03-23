@@ -12,19 +12,20 @@ Chess.Display = function(board) {
 
 Chess.Display.prototype.render = function(selectedPiece) {
   this.empty();
-  for (let i = 0; i < this.board.grid.length; i++) {
-    for (let j = 0; j < this.board.grid[i].length; j++) {
-      this.appendSquare(i, j, this.board.grid[i][j], selectedPiece);
+  this.addPlayersName();
+    for (let i = 0; i < this.board.grid.length; i++) {
+      for (let j = 0; j < this.board.grid[i].length; j++) {
+        this.appendSquare(i, j, this.board.grid[i][j], selectedPiece);
     }
   }
   if (this.currentState === this.states.End) this.gameOver(this.winner);
-}
+};
 
 Chess.Display.prototype.empty = function() {
   while(this.chessBoard.firstChild) {
     this.chessBoard.removeChild(this.chessBoard.firstChild);
   }
-}
+};
 
 Chess.Display.prototype.appendSquare = function(i, j, piece, selectedPiece) {
   const square = document.createElement("div");
@@ -77,6 +78,19 @@ Chess.Display.prototype.pawnPromotion = function(piece) {
 
 Chess.Display.prototype.clearPromotion = function() {
   this.render(null);
+};
+
+Chess.Display.prototype.addPlayersName = function() {
+  const blackPlayer = document.getElementsByClassName("player-name")[0];
+  const whitePlayer = document.getElementsByClassName("player-name")[1];
+  const inputForBlackPlayer = document.querySelectorAll(".player-name-input")[0];
+  inputForBlackPlayer.addEventListener("input", event => {
+    blackPlayer.textContent = event.target.value || "Black";
+  });
+  const inputForWhitePlayer = document.querySelectorAll(".player-name-input")[1];
+  inputForWhitePlayer.addEventListener("input", event => {
+    whitePlayer.textContent = event.target.value || "White";
+  });
 };
 
 Chess.Display.prototype.gameOver = function(color) {

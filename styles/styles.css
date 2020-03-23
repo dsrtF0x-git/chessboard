@@ -1,0 +1,66 @@
+.wrapper {
+  display: flex;
+  justify-content: center;
+}
+
+.board-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-right: 30px;
+}
+.board-container .player-info {
+  width: 600px;
+  display: flex;
+  justify-content: space-between;
+}
+.board-container .player-info .player-name.current-turn::after {
+  content: "";
+  display: inline-block;
+  margin-left: 5px;
+  background-color: green;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+}
+.board-container #chessboard {
+  width: 600px;
+  height: 600px;
+  border: 1px solid black;
+  margin: 15px auto;
+}
+.board-container #chessboard .green, .board-container #chessboard .brown, .board-container #chessboard .white {
+  text-align: center;
+  font-size: 65px;
+  line-height: 75px;
+  float: left;
+  cursor: pointer;
+}
+.board-container #chessboard .brown, .board-container #chessboard .white {
+  width: 75px;
+  height: 75px;
+}
+.board-container #chessboard .brown {
+  background: orangered;
+}
+.board-container #chessboard .white {
+  background: white;
+}
+.board-container #chessboard .green {
+  background: green;
+  width: 73px;
+  height: 73px;
+  border: 1px solid black;
+}
+
+.selected-piece {
+  color: blue;
+}
+
+.group:after {
+  display: block;
+  content: "";
+  clear: both;
+}
+
+/*# sourceMappingURL=styles.css.map */

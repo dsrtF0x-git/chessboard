@@ -1,23 +1,22 @@
-Chess.Board = function(grid) {
-  if (typeof grid !== "undefined") {
-    this.grid = grid;
-  } else {
-    this.init();
-  }
+Chess.Board = function(initGame) {
   this.moves = [];
+  this.blankBoard = initGame ? false : true;
+  this.init();
 }
 
 Chess.Board.prototype.init = function() {
   this.grid = [];
+  console.log("Board init")
   for (let i = 0; i < 8; i++) {
     this.grid.push([]);
     for (let j = 0; j < 8; j++) {
-      this.grid[i][j] = this.placePiece(i, j);
+      this.grid[i][j] = this.placePiece(this.blankBoard ? null : i, j);
     }
   }
 }
 
 Chess.Board.prototype.move = function(startPosition, endPosition) {
+  console.log("Board move")
   const piece1 = this.grid[startPosition[0]][startPosition[1]],
         piece2 = this.grid[endPosition[0]][endPosition[1]];
 

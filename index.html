@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Chess Game</title>
-  <link rel="stylesheet" href="styles/style.css">
+  <link rel="stylesheet" href="styles/styles.css">
   <script defer src="scripts/chess.js"></script>
   <script defer src="scripts/board.js"></script>
   <script defer src="scripts/display.js"></script>
@@ -13,8 +13,36 @@
   <script defer src="scripts/startGame.js"></script>
 </head>
 <body>
-  <div class="container">
-    <div class="chessboard" id="chessboard"></div>
+  <div class="wrapper">
+    <div class="board-container">
+      <div class="player-info">
+        <input class="player-name-input" type="text" placeholder="Enter your name">
+        <span class="player-name">Black</span>
+      </div>
+      <div class="chessboard" id="chessboard"></div>
+      <div class="player-info">
+        <input class="player-name-input" type="text" placeholder="Enter your name">
+        <span class="player-name current-turn">White</span>
+      </div>
+    </div>
+    <div class="game-log">
+      <div class="control-buttons">
+        <button id="start-game">Start new game</button>
+        <button id="restart-game">Restart game</button>
+      </div>
+      <p>Game log</p>
+      <div>
+        <table>
+          <thead>
+            <tr>
+              <td>Move #</td>
+              <td>white</td>
+              <td>black</td>
+            </tr>
+          </thead>
+        </table>
+      </div>
+    </div>
   </div>
 </body>
 </html>
