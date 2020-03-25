@@ -6,7 +6,6 @@ Chess.Board = function(initGame) {
 
 Chess.Board.prototype.init = function() {
   this.grid = [];
-  console.log("Board init")
   for (let i = 0; i < 8; i++) {
     this.grid.push([]);
     for (let j = 0; j < 8; j++) {
@@ -16,7 +15,6 @@ Chess.Board.prototype.init = function() {
 }
 
 Chess.Board.prototype.move = function(startPosition, endPosition) {
-  console.log("Board move")
   const piece1 = this.grid[startPosition[0]][startPosition[1]],
         piece2 = this.grid[endPosition[0]][endPosition[1]];
 
@@ -76,7 +74,6 @@ Chess.Board.prototype.reverseLastMove = function() {
 
   this.grid[endPosition[0]][endPosition[1]] = piece2;
   if (piece2 !== null) piece2.currentPosition = endPosition;
-
   this.moves.pop();
 };
 

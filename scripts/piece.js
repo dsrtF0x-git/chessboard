@@ -27,7 +27,6 @@ Chess.Piece.prototype.availableMoves = function() {
 };
 
 Chess.Piece.prototype.validMove = function(startPosition, endPosition) {
-  console.log("valid move")
   if (this.board.getPiece(endPosition) !== null && this.color === this.board.getPiece(endPosition).color) return false;
   if (this.board.getPiece(startPosition) instanceof Chess.Knight) return true;
   if (this.collisionCheck(startPosition, endPosition) === false) return false;
@@ -132,7 +131,8 @@ Chess.Piece.prototype.collisionCheck = function(startPosition, endPosition) {
 
 Chess.Queen = function(color, board, position) {
   this.init(color, board, position);
-  this.show = this.color === "black" ? "♛" : "♕";
+  this.show = this.color === "black" ? "<div><img src='./images/qd.svg'></div>" : "<div><img src='./images/ql.svg'></div>";
+  this.name = "Queen";
 };
 
 Chess.inheritsFromPiece(Chess.Queen);
@@ -151,7 +151,8 @@ Chess.Queen.prototype.validMove = function(startPosition, endPosition) {
 
 Chess.King = function(color, board, position) {
   this.init(color, board, position);
-  this.show = this.color === "black" ? "♚" : "♔";
+  this.show = this.color === "black" ? "<div><img src='./images/kd.svg'></div>" : "<div><img src='./images/kl.svg'></div>";
+  this.name = "King";
 };
 
 Chess.inheritsFromPiece(Chess.King);
@@ -290,7 +291,8 @@ Chess.King.prototype.getRooks = function() {
 
 Chess.Knight = function(color, board, position) {
   this.init(color, board, position);
-  this.show = this.color === "black" ? "♞" : "♘";
+  this.show = this.color === "black" ? "<div><img src='./images/nd.svg'></div>" : "<div><img src='./images/nl.svg'></div>";
+  this.name = "Knight";
 };
 
 Chess.inheritsFromPiece(Chess.Knight);
@@ -309,7 +311,8 @@ Chess.Knight.prototype.validMove = function(startPosition, endPosition) {
 
 Chess.Bishop = function(color, board, position) {
   this.init(color, board, position);
-  this.show = this.color === "black" ? "♝" : "♗";
+  this.show = this.color === "black" ? "<div><img src='./images/bd.svg'></div>" : "<div><img src='./images/bl.svg'></div>";
+  this.name = "Bishop";
 };
 
 Chess.inheritsFromPiece(Chess.Bishop);
@@ -328,7 +331,8 @@ Chess.Bishop.prototype.validMove = function(startPosition, endPosition) {
 
 Chess.Rook = function(color, board, position) {
   this.init(color, board, position);
-  this.show = this.color === "black" ? "♜" : "♖";
+  this.show = this.color === "black" ? "<div><img src='./images/rd.svg'></div>" : "<div><img src='./images/rl.svg'></div>";
+  this.name = "Rook";
 };
 
 Chess.inheritsFromPiece(Chess.Rook);
@@ -347,7 +351,8 @@ Chess.Rook.prototype.validMove = function(startPosition, endPosition) {
 
 Chess.Pawn = function(color, board, position) {
   this.init(color, board, position);
-  this.show = this.color === "black" ? "♟" : "♙";
+  this.show = this.color === "black" ? "<div><img src='./images/pd.svg'></div>" : "<div><img src='./images/pl.svg'></div>";
+  this.name = "Pawn";
 };
 
 Chess.inheritsFromPiece(Chess.Pawn);

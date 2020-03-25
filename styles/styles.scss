@@ -1,8 +1,125 @@
 $chess-board-size: 600px;
+@mixin rowNumeration {
+  position: absolute;
+  width: 15px;
+  height: 15px;
+  display: block;
+  right: 2px;
+  top: -25px;
+  font-size: 12px;
+}
+
+@mixin logCell {
+  text-align: center;
+  color: #fff;
+  padding: 0;
+}
+
+@mixin columnNumeration {
+  position: absolute;
+  width: 15px;
+  height: 15px;
+  display: block;
+  left: 2px;
+  bottom: 30px;
+  font-size: 12px;
+}
 
 .wrapper {
   display: flex;
   justify-content: center;
+}
+
+.game-log {
+
+  height: 700px;
+  width: 300px;
+
+  p {
+    margin: 14px 0;
+    text-align: center;
+  }
+
+  p ~ div {
+    overflow-y: auto;
+    height: 575px;
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+
+      thead {
+        background-color: #e58e26;
+
+        & td {
+          @include logCell;
+        }
+
+        & tr {
+          border-bottom: 1px solid #fa983a;
+          height: 40px;
+        }
+      }
+
+      tbody {
+        background-color: #f6b93b;
+
+        & tr {
+          border-bottom: 1px solid #fa983a;
+          height: 40px;
+        }
+
+        & td {
+          @include logCell;
+        }
+      }
+    }
+  }
+
+  & button {
+    height: 30px;
+  }
+
+  #restart-game {
+    color: #fff;
+    background-color: #dc3545;
+    border-color: #dc3545;
+    border: 1px solid transparent;
+    border-radius: 5px;
+    transition: all .3s;
+
+    &:hover {
+      background-color: #c82333;
+      border-color: #bd2130;
+      cursor: pointer;
+    }
+  }
+
+  #start-game {
+    color: #fff;
+    background-color: #28a745;
+    border: 1px solid transparent;
+    border-color: #28a745;
+    border-radius: 5px;
+    transition: all .3s;
+
+    &:disabled {
+      background-color: #6c757d;
+      border-color: #6c757d;
+      &:hover {
+        cursor: not-allowed;
+        background-color: #6c757d;
+        border-color: #6c757d;
+        cursor: pointer;
+      }
+    }
+
+    &:hover {
+      background-color: #218838;
+      cursor: pointer;
+      border-color: #1e7e34;
+    }
+  }
 }
 
 .board-container {
@@ -10,17 +127,25 @@ $chess-board-size: 600px;
   flex-direction: column;
   align-items: center;
   margin-right: 30px;
+  height: 700px;
+  justify-content: space-between;
 
   .player-info {
     width: $chess-board-size;
     display: flex;
     justify-content: space-between;
 
+    .player-name-input {
+      border-radius: 5px;
+      border: 1px solid #ccc;
+      padding: 5px;
+    }
+
     .player-name.current-turn::after {
       content: "";
       display: inline-block;
       margin-left: 5px;
-      background-color: green;
+      background-color: #78e08f;
       width: 10px;
       height: 10px;
       border-radius: 50%;
@@ -31,14 +156,49 @@ $chess-board-size: 600px;
     width: $chess-board-size;
     height: $chess-board-size;
     border: 1px solid black;
-    margin: 15px auto;
+    margin: 0 auto;
+    position: relative;
 
-    .green, .brown, .white {
+    .chessboard-modal {
+      position: absolute !important;
+      width: $chess-board-size;
+      height: $chess-board-size;
+      background-color: #b8e994;
+      display: flex;
+      flex-direction: column;
+      z-index: 99;
+      align-items: center;
+      justify-content: center;
+
+      .modal-question {
+        color: #fff;
+        font-size: 50px;
+      }
+
+      button {
+        background-color: #28a745;
+        border: 1px solid transparent;
+        border-color: #28a745;
+        color: #fff;
+        cursor: pointer;
+        border-radius: 5px;
+        height: 40px;
+        width: 100px;
+        margin: 5px;
+      }
+    }
+
+    .possibleMove, .brown, .white {
       text-align: center;
       font-size: $chess-board-size / 8 - 10px;
       line-height: $chess-board-size / 8;
       float: left;
       cursor: pointer;
+
+      & img {
+        width: 65px;
+        height: 65px;
+      }
     }
 
     .brown, .white {
@@ -46,25 +206,146 @@ $chess-board-size: 600px;
       height: $chess-board-size / 8;
     }
 
+    .selected-piece {
+      background-color: #b8e994 !important;
+    }
+
     .brown {
-      background: orangered;
+      background: #f8c291;
     }
     
     .white {
       background: white;
     }
     
-    .green {
-      background: green;
+    .possibleMove {
+      background: #78e08f;
       width: $chess-board-size / 8 - 2px;
       height: $chess-board-size / 8 - 2px;
-      border: 1px solid black;
+      border: 1px solid rgba(0, 0, 0, .2);
+    }
+
+    & :nth-child(57) {
+      position: relative;
+      &::after {
+        content: "a";
+        @include columnNumeration;
+      }
+    }
+
+    & :nth-child(58) {
+      position: relative;
+      &::after {
+        content: "b";
+        @include columnNumeration;
+      }
+    }
+
+    & :nth-child(59) {
+      position: relative;
+      &::after {
+        content: "c";
+        @include columnNumeration;
+      }
+    }
+
+    & :nth-child(60) {
+      position: relative;
+      &::after {
+        content: "d";
+        @include columnNumeration;
+      }
+    }
+
+    & :nth-child(61) {
+      position: relative;
+      &::after {
+        content: "e";
+        @include columnNumeration;
+      }
+    }
+
+    & :nth-child(62) {
+      position: relative;
+      &::after {
+        content: "f";
+        @include columnNumeration;
+      }
+    }
+
+    & :nth-child(63) {
+      position: relative;
+      &::after {
+        content: "g";
+        @include columnNumeration;
+      }
+    }
+
+    & :nth-child(64) {
+      position: relative;
+      &::before {
+        content: "h";
+        @include columnNumeration;
+      }
+    }
+
+    & :nth-child(8) {
+      position: relative;
+      &::after {
+        content: "8";
+        @include rowNumeration;
+      }
+    }
+    & :nth-child(16) {
+      position: relative;
+      &::after {
+        content: "7";
+        @include rowNumeration;
+      }
+    }
+    & :nth-child(24) {
+      position: relative;
+      &::after {
+        content: "6";
+        @include rowNumeration;
+      }
+    }
+    & :nth-child(32) {
+      position: relative;
+      &::after {
+        content: "5";
+        @include rowNumeration;
+      }
+    }
+    & :nth-child(40) {
+      position: relative;
+      &::after {
+        content: "4";
+        @include rowNumeration;
+      }
+    }
+    & :nth-child(48) {
+      position: relative;
+      &::after {
+        content: "3";
+        @include rowNumeration;
+      }
+    }
+    & :nth-child(56) {
+      position: relative;
+      &::after {
+        content: "2";
+        @include rowNumeration;
+      }
+    }
+    & :nth-child(64) {
+      position: relative;
+      &::after {
+        content: "1";
+        @include rowNumeration;
+      }
     }
   }
-}
-
-.selected-piece {
-  color: blue;
 }
 
 .group:after {

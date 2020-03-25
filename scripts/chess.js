@@ -22,6 +22,7 @@ const Chess = {
       this.endPosition = array;
       this.move(this.startPosition, this.endPosition);
       piece = null;
+      this.display.showMovesHistory(this.display.board.moves[this.display.board.moves.length - 1]);
     }
     this.display.render(piece);
   },
@@ -30,7 +31,6 @@ const Chess = {
     if (this.board.move(startPosition, endPosition)) {
       this.reverseIfInCheck(this.changeTurns.bind(this));
       this.gameOver();
-      // Check gameover algo
     }
     this.startPosition = null;
     this.endPosition = null;
@@ -55,7 +55,6 @@ const Chess = {
   },
 
   gameOver() {
-    console.log("Chess: gameover")
     if (this.currentTurn === "white") {
       if (this.wKing.checkmate()) {
         this.display.showWinner(document.querySelectorAll(".player-name")[0].textContent);
