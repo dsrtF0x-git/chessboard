@@ -25,6 +25,11 @@ $chess-board-size: 600px;
   font-size: 12px;
 }
 
+body {
+  background-color: #d7ccc8;
+  margin: 10px 0;
+}
+
 .wrapper {
   display: flex;
   justify-content: center;
@@ -110,7 +115,6 @@ $chess-board-size: 600px;
         cursor: not-allowed;
         background-color: #6c757d;
         border-color: #6c757d;
-        cursor: pointer;
       }
     }
 
@@ -134,6 +138,19 @@ $chess-board-size: 600px;
     width: $chess-board-size;
     display: flex;
     justify-content: space-between;
+
+    .beaten-pieces {
+      margin: 0;
+      font-size: 25px;
+    }
+
+    .removed-white {
+      color: white;
+    }
+
+    .removed-black {
+      color: black;
+    }
 
     .player-name-input {
       border-radius: 5px;

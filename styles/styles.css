@@ -1,3 +1,8 @@
+body {
+  background-color: #d7ccc8;
+  margin: 10px 0;
+}
+
 .wrapper {
   display: flex;
   justify-content: center;
@@ -75,7 +80,6 @@
   cursor: not-allowed;
   background-color: #6c757d;
   border-color: #6c757d;
-  cursor: pointer;
 }
 .game-log #start-game:hover {
   background-color: #218838;
@@ -95,6 +99,16 @@
   width: 600px;
   display: flex;
   justify-content: space-between;
+}
+.board-container .player-info .beaten-pieces {
+  margin: 0;
+  font-size: 25px;
+}
+.board-container .player-info .removed-white {
+  color: white;
+}
+.board-container .player-info .removed-black {
+  color: black;
 }
 .board-container .player-info .player-name-input {
   border-radius: 5px;
