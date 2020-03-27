@@ -28,7 +28,11 @@ const Chess = {
   },
 
   move(startPosition, endPosition) {
+    let endPiece = this.board.getPiece(endPosition);
     if (this.board.move(startPosition, endPosition)) {
+      if (endPiece !== null && this.currentTurn !== endPiece.color) {
+        this.display.addBeatenPiece(endPiece);
+      }
       this.reverseIfInCheck(this.changeTurns.bind(this));
       this.gameOver();
     }

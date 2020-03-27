@@ -25,6 +25,7 @@ Chess.Display.prototype.render = function(selectedPiece) {
 Chess.Display.prototype.clearMovesHistory = function() {
   const logTable = document.querySelector(".logs");
   const playerNames = document.querySelectorAll(".player-name");
+  document.querySelectorAll(".beaten-pieces").forEach(item => item.innerHTML = "");
   if (playerNames[0].className.includes("current-turn")) {
     playerNames[0].classList.remove("current-turn");
     playerNames[1].classList.add("current-turn");
@@ -66,11 +67,19 @@ Chess.Display.prototype.appendSquare = function(i, j, piece, selectedPiece) {
   this.chessBoard.appendChild(square);
 };
 
+Chess.Display.prototype.addBeatenPiece = function(piece) {
+  if (piece === null) return;
+  const blacksTrophies = document.querySelectorAll(".beaten-pieces")[0];
+  const whiteTrophies = document.querySelectorAll(".beaten-pieces")[1];
+  piece.color === "white" ? blacksTrophies.innerHTML += `${piece.icon}` : whiteTrophies.innerHTML += `${piece.icon}`;
+}
+
 Chess.Display.prototype.showMovesHistory = function(lastMove) {
   const logGameTable = document.querySelector(".logs");
   const moveFrom = Chess.Util._trackMove(lastMove[0], lastMove[1]).split(":")[0];
   const moveTo = Chess.Util._trackMove(lastMove[0], lastMove[1]).split(":")[1];
   const tableRow = `<tr>
+                      <td>${this.board.moves.length}</td>
                       <td>${lastMove[2].color}</td>
                       <td>${lastMove[2].name}</td>
                       <td>${moveFrom}</td>
