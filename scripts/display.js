@@ -1,4 +1,8 @@
-Chess.Display = function(board) {
+import { Chess } from "./chess.js";
+import { Util } from "./util.js";
+import { Pawn } from "./piece.js";
+
+export const Display = function(board) {
   this.board = board;
   this.chessBoard = document.getElementById("chessboard");
   this.currentState = 1;
@@ -12,7 +16,7 @@ Chess.Display = function(board) {
   this.addPlayersName();
 };
 
-Chess.Display.prototype.render = function(selectedPiece) {
+Display.prototype.render = function(selectedPiece) {
   this.empty();
   for (let i = 0; i < this.board.grid.length; i++) {
     for (let j = 0; j < this.board.grid[i].length; j++) {
@@ -22,7 +26,7 @@ Chess.Display.prototype.render = function(selectedPiece) {
   if (this.currentState === this.states.End) this.gameOver(this.winner);
 };
 
-Chess.Display.prototype.clearMovesHistory = function() {
+Display.prototype.clearMovesHistory = function() {
   const logTable = document.querySelector(".logs");
   const playerNames = document.querySelectorAll(".player-name");
   document.querySelectorAll(".beaten-pieces").forEach(item => item.innerHTML = "");
@@ -33,18 +37,18 @@ Chess.Display.prototype.clearMovesHistory = function() {
   logTable.innerHTML = ``;
 };
 
-Chess.Display.prototype.empty = function() {
+Display.prototype.empty = function() {
   while(this.chessBoard.firstChild) {
     this.chessBoard.removeChild(this.chessBoard.firstChild);
   }
 };
 
-Chess.Display.prototype.appendSquare = function(i, j, piece, selectedPiece) {
+Display.prototype.appendSquare = function(i, j, piece, selectedPiece) {
   const square = document.createElement("div");
 
-  if (piece instanceof Chess.Pawn) piece.promotion();
+  if (piece instanceof Pawn) piece.promotion();
 
-  if (selectedPiece !== null && Chess.Util._includesSubArray(selectedPiece.moves, [i, j])) {
+  if (selectedPiece !== null && Util._includesSubArray(selectedPiece.moves, [i, j])) {
     square.className = "possibleMove";
   } else if ((i + j) % 2 === 0) {
     square.className = "white";
@@ -67,17 +71,17 @@ Chess.Display.prototype.appendSquare = function(i, j, piece, selectedPiece) {
   this.chessBoard.appendChild(square);
 };
 
-Chess.Display.prototype.addBeatenPiece = function(piece) {
+Display.prototype.addBeatenPiece = function(piece) {
   if (piece === null) return;
   const blacksTrophies = document.querySelectorAll(".beaten-pieces")[0];
   const whiteTrophies = document.querySelectorAll(".beaten-pieces")[1];
   piece.color === "white" ? blacksTrophies.innerHTML += `${piece.icon}` : whiteTrophies.innerHTML += `${piece.icon}`;
 }
 
-Chess.Display.prototype.showMovesHistory = function(lastMove) {
+Display.prototype.showMovesHistory = function(lastMove) {
   const logGameTable = document.querySelector(".logs");
-  const moveFrom = Chess.Util._trackMove(lastMove[0], lastMove[1]).split(":")[0];
-  const moveTo = Chess.Util._trackMove(lastMove[0], lastMove[1]).split(":")[1];
+  const moveFrom = Util._trackMove(lastMove[0], lastMove[1]).split(":")[0];
+  const moveTo = Util._trackMove(lastMove[0], lastMove[1]).split(":")[1];
   const tableRow = `<tr>
                       <td>${this.board.moves.length}</td>
                       <td>${lastMove[2].color}</td>
@@ -97,7 +101,7 @@ Chess.Display.prototype.showMovesHistory = function(lastMove) {
   logGameTable.innerHTML += tableRow;
 }
 
-Chess.Display.prototype.pawnPromotion = function(piece) {
+Display.prototype.pawnPromotion = function(piece) {
   // const modalBg = document.createElement("div");
   const modal = document.createElement("div");
   const question = document.createElement("p");
@@ -118,11 +122,11 @@ Chess.Display.prototype.pawnPromotion = function(piece) {
   this.chessBoard.appendChild(modal);
 };
 
-Chess.Display.prototype.clearPromotion = function() {
+Display.prototype.clearPromotion = function() {
   this.render(null);
 };
 
-Chess.Display.prototype.addPlayersName = function() {
+Display.prototype.addPlayersName = function() {
   const blackPlayer = document.getElementsByClassName("player-name")[0];
   const whitePlayer = document.getElementsByClassName("player-name")[1];
   const inputForBlackPlayer = document.querySelectorAll(".player-name-input")[0];
@@ -135,7 +139,7 @@ Chess.Display.prototype.addPlayersName = function() {
   });
 };
 
-Chess.Display.prototype.gameOver = function(color) {
+Display.prototype.gameOver = function(color) {
   const modalBg = document.createElement("div");
   const modal = document.createElement("div");
   const question = document.createElement("p");
@@ -157,12 +161,12 @@ Chess.Display.prototype.gameOver = function(color) {
   this.chessBoard.appendChild(modal);
 };
 
-Chess.Display.prototype.showWinner = function(color) {
+Display.prototype.showWinner = function(color) {
   this.currentState = this.states.End;
   this.winner = color;
 };
 
-Chess.Display.prototype.generateButton = function(piece, choice, element) {
+Display.prototype.generateButton = function(piece, choice, element) {
   const choosePiece = document.createElement("button");
   choosePiece.type = "button";
   choosePiece.textContent = choice;

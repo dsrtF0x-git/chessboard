@@ -1,3 +1,5 @@
+import { Chess } from "./chess.js";
+
 document.addEventListener("DOMContentLoaded", () => {
   Chess.newGame();
   const startButton = document.getElementById("start-game");

@@ -1,9 +1,13 @@
-const Chess = {
+import { Board } from "./board.js";
+import { Util } from "./util.js"
+import { Display } from "./display.js";
+
+export const Chess = {
   newGame(initGame) {
     this.startPosition = null;
     this.endPosition = null;
-    this.board = new this.Board(initGame);
-    this.display = new this.Display(this.board);
+    this.board = new Board(initGame);
+    this.display = new Display(this.board);
     this.bKing = this.board.grid[0][4];
     this.wKing = this.board.grid[7][4];
     this.currentTurn = "white";
@@ -14,7 +18,7 @@ const Chess = {
     if (this.startPosition === null && piece !== null && piece.color === this.currentTurn) {
       this.startPosition = array;
       piece.availableMoves();
-    } else if (this.Util._arrayEquals(this.startPosition, array)) {
+    } else if (Util._arrayEquals(this.startPosition, array)) {
       this.startPosition = null;
       this.moves = [];
       piece = null;
@@ -31,7 +35,10 @@ const Chess = {
     let endPiece = this.board.getPiece(endPosition);
     if (this.board.move(startPosition, endPosition)) {
       if (endPiece !== null && this.currentTurn !== endPiece.color) {
-        this.display.addBeatenPiece(endPiece);
+        let king = endPiece.color === "black" ? this.wKing : this.bKing;
+        if (!king.inCheck()) {
+          this.display.addBeatenPiece(endPiece);
+        }
       }
       this.reverseIfInCheck(this.changeTurns.bind(this));
       this.gameOver();

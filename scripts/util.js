@@ -1,4 +1,4 @@
-Chess.Util = {
+export const Util = {
   _includesSubArray(array, subArray) {
     for (let i = 0; i < array.length; i++) {
       if (this._arrayEquals(array[i], subArray) === true) return true;

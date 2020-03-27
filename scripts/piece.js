@@ -1,12 +1,15 @@
-Chess.inheritsFromPiece = function(child) {
-  child.prototype = Object.create(Chess.Piece.prototype);
+import { Chess } from "./chess.js";
+import { Util } from "./util.js";
+
+const inheritsFromPiece = function(child) {
+  child.prototype = Object.create(Piece.prototype);
 };
 
-Chess.Piece = function(color, board, position) {
+export const Piece = function(color, board, position) {
   this.init(color, board, position);
 };
 
-Chess.Piece.prototype.init = function(color, board, position) {
+Piece.prototype.init = function(color, board, position) {
   this.color = color;
   this.board = board;
   this.currentPosition = position;
@@ -14,7 +17,7 @@ Chess.Piece.prototype.init = function(color, board, position) {
   this.moves = [];
 };
 
-Chess.Piece.prototype.availableMoves = function() {
+Piece.prototype.availableMoves = function() {
   this.moves = [];
   for (let i = 0; i < this.board.grid.length; i++) {
     for (let j = 0; j < this.board.grid[i].length; j++) {
@@ -26,14 +29,14 @@ Chess.Piece.prototype.availableMoves = function() {
   return this.moves;
 };
 
-Chess.Piece.prototype.validMove = function(startPosition, endPosition) {
+Piece.prototype.validMove = function(startPosition, endPosition) {
   if (this.board.getPiece(endPosition) !== null && this.color === this.board.getPiece(endPosition).color) return false;
-  if (this.board.getPiece(startPosition) instanceof Chess.Knight) return true;
+  if (this.board.getPiece(startPosition) instanceof Knight) return true;
   if (this.collisionCheck(startPosition, endPosition) === false) return false;
   return true;
 };
 
-Chess.Piece.prototype.pieceDirection = function(startPosition, endPosition) {
+Piece.prototype.pieceDirection = function(startPosition, endPosition) {
   let a = startPosition[0],
       b = startPosition[1],
       x = endPosition[0],
@@ -58,7 +61,7 @@ Chess.Piece.prototype.pieceDirection = function(startPosition, endPosition) {
   }
 };
 
-Chess.Piece.prototype.collisionCheck = function(startPosition, endPosition) {
+Piece.prototype.collisionCheck = function(startPosition, endPosition) {
   let a = startPosition[0],
       b = startPosition[1],
       x = endPosition[0],
@@ -129,37 +132,36 @@ Chess.Piece.prototype.collisionCheck = function(startPosition, endPosition) {
   return true;
 };
 
-Chess.Queen = function(color, board, position) {
+export const Queen = function(color, board, position) {
   this.init(color, board, position);
   this.show = this.color === "black" ? "<div><img src='./images/qd.svg'></div>" : "<div><img src='./images/ql.svg'></div>";
   this.name = "Queen";
   this.icon = "♕";
 };
 
-Chess.inheritsFromPiece(Chess.Queen);
+inheritsFromPiece(Queen);
 
-Chess.Queen.prototype.validMove = function(startPosition, endPosition) {
+Queen.prototype.validMove = function(startPosition, endPosition) {
   const a = startPosition[0],
         b = startPosition[1],
         x = endPosition[0],
         y = endPosition[1];
 
   if (Math.abs(x - a) === Math.abs(y - b) || x === a || y === b) {
-    return Chess.Piece.prototype.validMove.call(this, startPosition, endPosition);
+    return Piece.prototype.validMove.call(this, startPosition, endPosition);
   }
   return false;
 };
 
-Chess.King = function(color, board, position) {
+export const King = function(color, board, position) {
   this.init(color, board, position);
   this.show = this.color === "black" ? "<div><img src='./images/kd.svg'></div>" : "<div><img src='./images/kl.svg'></div>";
   this.name = "King";
   this.icon = "♔";
 };
 
-Chess.inheritsFromPiece(Chess.King);
-
-Chess.King.prototype.validMove = function(startPosition, endPosition) {
+inheritsFromPiece(King);
+King.prototype.validMove = function(startPosition, endPosition) {
   const a = startPosition[0],
         b = startPosition[1],
         x = endPosition[0],
@@ -174,12 +176,12 @@ Chess.King.prototype.validMove = function(startPosition, endPosition) {
     if (Math.abs(x - enemyKingPositionX) <= 1 && Math.abs(y - enemyKingPositionY) <= 1) {
       return false;
     }
-    return Chess.Piece.prototype.validMove.call(this, startPosition, endPosition);
+    return Piece.prototype.validMove.call(this, startPosition, endPosition);
   }
   return false;
 };
 
-Chess.King.prototype.checkmate = function() {
+King.prototype.checkmate = function() {
   let startPosition, endPosition, piece;
   for (let i = 0; i < this.board.grid.length; i++) {
     for (let j = 0; j < this.board.grid[i].length; j++) {
@@ -205,55 +207,56 @@ Chess.King.prototype.checkmate = function() {
   return true;
 };
 
-Chess.King.prototype.inCheck = function(position) {
+King.prototype.inCheck = function(position) {
+  console.log("check")
   let piece;
   if (typeof position === "undefined") position = this.currentPosition;
 
   for (let i = 0; i < this.board.grid.length; i++) {
     for (let j = 0; j < this.board.grid[i].length; j++) {
       piece = this.board.getPiece([i, j]);
-      if (piece !== null && piece.color !== this.color && !(piece instanceof Chess.King)) {
-        if (Chess.Util._includesSubArray(piece.availableMoves(), position)) return true;
+      if (piece !== null && piece.color !== this.color && !(piece instanceof King)) {
+        if (Util._includesSubArray(piece.availableMoves(), position)) return true;
       }
     }
   }
   return false;
 };
 
-Chess.King.prototype.didCastle = function(lastPosition) {
+King.prototype.didCastle = function(lastPosition) {
   if (
     this.color === "white" &&
-    Chess.Util._arrayEquals(lastPosition, [7, 4]) &&
+    Util._arrayEquals(lastPosition, [7, 4]) &&
     this.moved === 1 && 
-    (Chess.Util._arrayEquals(this.currentPosition, [7, 6]) || Chess.Util._arrayEquals(this.currentPosition, [7, 2]))
+    (Util._arrayEquals(this.currentPosition, [7, 6]) || Util._arrayEquals(this.currentPosition, [7, 2]))
   ) {
     return true;
   } else if (
     this.color === "black" &&
-    Chess.Util._arrayEquals(lastPosition, [0, 4]) &&
+    Util._arrayEquals(lastPosition, [0, 4]) &&
     this.moved === 1 &&
-    (Chess.Util._arrayEquals(this.currentPosition, [0, 6]) || Chess.Util._arrayEquals(this.currentPosition, [0, 2]))
+    (Util._arrayEquals(this.currentPosition, [0, 6]) || Util._arrayEquals(this.currentPosition, [0, 2]))
   ) {
     return true;
   }
   return false;
 };
 
-Chess.King.prototype.checkIfCastleMove = function(endPosition) {
+King.prototype.checkIfCastleMove = function(endPosition) {
   const castlingDirection = this.castlingDirection();
-  if (this.color === "white" && Chess.Util._arrayEquals(endPosition, [7, 2]) && castlingDirection[0]) {
+  if (this.color === "white" && Util._arrayEquals(endPosition, [7, 2]) && castlingDirection[0]) {
     return true;
-  } else if (this.color === "white" && Chess.Util._arrayEquals(endPosition, [7, 6]) && castlingDirection[1]) {
+  } else if (this.color === "white" && Util._arrayEquals(endPosition, [7, 6]) && castlingDirection[1]) {
     return true;
-  } else if (this.color === "black" && Chess.Util._arrayEquals(endPosition, [0, 2]) && castlingDirection[0]) {
+  } else if (this.color === "black" && Util._arrayEquals(endPosition, [0, 2]) && castlingDirection[0]) {
     return true;
-  } else if (this.color === "black" && Chess.Util._arrayEquals(endPosition, [0, 6]) && castlingDirection[1]) {
+  } else if (this.color === "black" && Util._arrayEquals(endPosition, [0, 6]) && castlingDirection[1]) {
     return true;
   }
   return false;
 };
 
-Chess.King.prototype.castlingDirection = function() {
+King.prototype.castlingDirection = function() {
   const rooks = this.getRooks();
   const result = [];
 
@@ -263,7 +266,7 @@ Chess.King.prototype.castlingDirection = function() {
   return result;
 };
 
-Chess.King.prototype.castlingCollisionCheck = function(direction) {
+King.prototype.castlingCollisionCheck = function(direction) {
   for (let i = 0; i < 2; i++) {
     if (this.color === "white" && direction === "left") {
       if (this.board.getPiece([7, 3 - i]) !== null || this.inCheck([7, 3 - i])) return false;
@@ -278,7 +281,7 @@ Chess.King.prototype.castlingCollisionCheck = function(direction) {
   return true;
 };
 
-Chess.King.prototype.canCastle = function(rook) {
+King.prototype.canCastle = function(rook) {
   if (this.moved > 0 || this.inCheck()) {
     return false;
   } else if (rook === null || rook.moved > 0) {
@@ -287,7 +290,7 @@ Chess.King.prototype.canCastle = function(rook) {
   return true;
 };
 
-Chess.King.prototype.getRooks = function() {
+King.prototype.getRooks = function() {
   if (this.color === "white") {
     return [this.board.getPiece([7, 0]), this.board.getPiece([7, 7])];
   } else if (this.color === "black") {
@@ -295,79 +298,79 @@ Chess.King.prototype.getRooks = function() {
   }
 };
 
-Chess.Knight = function(color, board, position) {
+export const Knight = function(color, board, position) {
   this.init(color, board, position);
   this.show = this.color === "black" ? "<div><img src='./images/nd.svg'></div>" : "<div><img src='./images/nl.svg'></div>";
   this.name = "Knight";
   this.icon = "♘";
 };
 
-Chess.inheritsFromPiece(Chess.Knight);
+inheritsFromPiece(Knight);
 
-Chess.Knight.prototype.validMove = function(startPosition, endPosition) {
+Knight.prototype.validMove = function(startPosition, endPosition) {
   const a = startPosition[0],
         b = startPosition[1],
         x = endPosition[0],
         y = endPosition[1];
 
   if ((Math.abs(x - a) === 1 && Math.abs(y - b) === 2) || (Math.abs(x - a) === 2 && Math.abs(y - b) === 1)) {
-    return Chess.Piece.prototype.validMove.call(this, startPosition, endPosition);
+    return Piece.prototype.validMove.call(this, startPosition, endPosition);
   }
   return false;
 };
 
-Chess.Bishop = function(color, board, position) {
+export const Bishop = function(color, board, position) {
   this.init(color, board, position);
   this.show = this.color === "black" ? "<div><img src='./images/bd.svg'></div>" : "<div><img src='./images/bl.svg'></div>";
   this.name = "Bishop";
   this.icon = "♗";
 };
 
-Chess.inheritsFromPiece(Chess.Bishop);
+inheritsFromPiece(Bishop);
 
-Chess.Bishop.prototype.validMove = function(startPosition, endPosition) {
+Bishop.prototype.validMove = function(startPosition, endPosition) {
   const a = startPosition[0],
         b = startPosition[1],
         x = endPosition[0],
         y = endPosition[1];
   
   if (Math.abs(x - a) === Math.abs(y - b)) {
-    return Chess.Piece.prototype.validMove.call(this, startPosition, endPosition);
+    return Piece.prototype.validMove.call(this, startPosition, endPosition);
   }
   return false;
 };
 
-Chess.Rook = function(color, board, position) {
+export const Rook = function(color, board, position) {
   this.init(color, board, position);
   this.show = this.color === "black" ? "<div><img src='./images/rd.svg'></div>" : "<div><img src='./images/rl.svg'></div>";
   this.name = "Rook";
   this.icon = "♖";
 };
 
-Chess.inheritsFromPiece(Chess.Rook);
+inheritsFromPiece(Rook);
 
-Chess.Rook.prototype.validMove = function(startPosition, endPosition) {
+Rook.prototype.validMove = function(startPosition, endPosition) {
   const a = startPosition[0],
         b = startPosition[1],
         x = endPosition[0],
         y = endPosition[1];
 
   if (x === a || y === b) {
-    return Chess.Piece.prototype.validMove.call(this, startPosition, endPosition);
+    return Piece.prototype.validMove.call(this, startPosition, endPosition);
   }
   return false;
 };
 
-Chess.Pawn = function(color, board, position) {
+export const Pawn = function(color, board, position) {
   this.init(color, board, position);
   this.show = this.color === "black" ? "<div><img src='./images/pd.svg'></div>" : "<div><img src='./images/pl.svg'></div>";
   this.name = "Pawn";
   this.icon = "♙";
 };
 
-Chess.inheritsFromPiece(Chess.Pawn);
+inheritsFromPiece(Pawn);
 
-Chess.Pawn.prototype.validMove = function(startPosition, endPosition) {
+Pawn.prototype.validMove = function(startPosition, endPosition) {
   const a = startPosition[0],
         b = startPosition[1],
         x = endPosition[0],
@@ -387,10 +390,10 @@ Chess.Pawn.prototype.validMove = function(startPosition, endPosition) {
   }
 
   let expression = this.color === "black" ? x - a === 1 && y === b : x - a === -1 && y === b;
-  if (expression) return Chess.Piece.prototype.validMove.call(this, startPosition, endPosition);
+  if (expression) return Piece.prototype.validMove.call(this, startPosition, endPosition);
 };
 
-Chess.Pawn.prototype.promotion = function() {
+Pawn.prototype.promotion = function() {
   if (this.color === "white" && this.currentPosition[0] === 0) {
     Chess.display.pawnPromotion(this);
   } else if (this.color === "black" && this.currentPosition[0] === 7) {
@@ -398,34 +401,34 @@ Chess.Pawn.prototype.promotion = function() {
   }
 };
 
-Chess.Pawn.prototype.toQueen = function() {
+Pawn.prototype.toQueen = function() {
   const x = this.currentPosition[0];
   const y = this.currentPosition[1];
-  this.board.grid[x][y] = new Chess.Queen(this.color, this.board, this.currentPosition);
+  this.board.grid[x][y] = new Queen(this.color, this.board, this.currentPosition);
 
   if (typeof Chess.display !== "undefined") Chess.display.clearPromotion();
 };
 
-Chess.Pawn.prototype.toBishop = function() {
+Pawn.prototype.toBishop = function() {
   const x = this.currentPosition[0];
   const y = this.currentPosition[1];
-  this.board.grid[x][y] = new Chess.Bishop(this.color, this.board, this.currentPosition);
+  this.board.grid[x][y] = new Bishop(this.color, this.board, this.currentPosition);
 
   if (typeof Chess.display !== "undefined") Chess.display.clearPromotion();
 };
 
-Chess.Pawn.prototype.toRook = function() {
+Pawn.prototype.toRook = function() {
   const x = this.currentPosition[0];
   const y = this.currentPosition[1];
-  this.board.grid[x][y] = new Chess.Rook(this.color, this.board, this.currentPosition);
+  this.board.grid[x][y] = new Rook(this.color, this.board, this.currentPosition);
 
   if (typeof Chess.display !== "undefined") Chess.display.clearPromotion();
 };
 
-Chess.Pawn.prototype.toKnight = function() {
+Pawn.prototype.toKnight = function() {
   const x = this.currentPosition[0];
   const y = this.currentPosition[1];
-  this.board.grid[x][y] = new Chess.Knight(this.color, this.board, this.currentPosition);
+  this.board.grid[x][y] = new Knight(this.color, this.board, this.currentPosition);
 
   if (typeof Chess.display !== "undefined") Chess.display.clearPromotion();
 };

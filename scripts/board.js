@@ -1,10 +1,13 @@
-Chess.Board = function(initGame) {
+import { Chess } from "./chess.js";
+import { Rook, Pawn, Bishop, Queen, King, Knight } from "./piece.js";
+
+export const Board = function(initGame) {
   this.moves = [];
   this.blankBoard = initGame ? false : true;
   this.init();
 }
 
-Chess.Board.prototype.init = function() {
+Board.prototype.init = function() {
   this.grid = [];
   for (let i = 0; i < 8; i++) {
     this.grid.push([]);
@@ -14,7 +17,7 @@ Chess.Board.prototype.init = function() {
   }
 }
 
-Chess.Board.prototype.move = function(startPosition, endPosition) {
+Board.prototype.move = function(startPosition, endPosition) {
   const piece1 = this.grid[startPosition[0]][startPosition[1]],
         piece2 = this.grid[endPosition[0]][endPosition[1]];
 
@@ -26,7 +29,7 @@ Chess.Board.prototype.move = function(startPosition, endPosition) {
   return false;
 };
 
-Chess.Board.prototype.movePiece = function(piece1, piece2, startPosition, endPosition) {
+Board.prototype.movePiece = function(piece1, piece2, startPosition, endPosition) {
   this.grid[startPosition[0]][startPosition[1]] = null;
   this.grid[endPosition[0]][endPosition[1]] = piece1;
   piece1.currentPosition = endPosition;
@@ -34,13 +37,13 @@ Chess.Board.prototype.movePiece = function(piece1, piece2, startPosition, endPos
   this.moves.push([startPosition, endPosition, piece1, piece2]);
 };
 
-Chess.Board.prototype.didKingCastle = function(piece, lastPosition) {
-  if (piece instanceof Chess.King && piece.didCastle(lastPosition)) {
+Board.prototype.didKingCastle = function(piece, lastPosition) {
+  if (piece instanceof King && piece.didCastle(lastPosition)) {
     this.findRook(piece, lastPosition);
   }
 };
 
-Chess.Board.prototype.findRook = function(king) {
+Board.prototype.findRook = function(king) {
   if (king.color === "white") {
     if (Chess.Util._arrayEquals(king.currentPosition, [7, 6])) {
       this.moveRook([7, 7], [7, 5]);
@@ -56,12 +59,12 @@ Chess.Board.prototype.findRook = function(king) {
   }
 };
 
-Chess.Board.prototype.moveRook = function(startPosition, endPosition) {
+Board.prototype.moveRook = function(startPosition, endPosition) {
   const rook = this.getPiece(startPosition);
   this.movePiece(rook, null, startPosition, endPosition);
 };
 
-Chess.Board.prototype.reverseLastMove = function() {
+Board.prototype.reverseLastMove = function() {
   let lastMove = this.moves[this.moves.length - 1],
       startPosition = lastMove[0],
       endPosition = lastMove[1],
@@ -77,36 +80,36 @@ Chess.Board.prototype.reverseLastMove = function() {
   this.moves.pop();
 };
 
-Chess.Board.prototype.getPiece = function(array) {
+Board.prototype.getPiece = function(array) {
   return this.grid[array[0]][array[1]];
 };
 
-Chess.Board.prototype.placePiece = function(i, j) {
+Board.prototype.placePiece = function(i, j) {
   const position = [i, j];
   if (i === 1) {
-    return new Chess.Pawn("black", this, position);
+    return new Pawn("black", this, position);
   } else if (i === 6) {
-    return new Chess.Pawn("white", this, position);
+    return new Pawn("white", this, position);
   } else if (i === 0 && (j === 0 || j === 7)) {
-    return new Chess.Rook("black", this, position);
+    return new Rook("black", this, position);
   } else if (i === 0 && (j === 1 || j === 6)) {
-    return new Chess.Knight("black", this, position);
+    return new Knight("black", this, position);
   } else if (i === 0 && (j === 2 || j === 5)) {
-    return new Chess.Bishop("black", this, position);
+    return new Bishop("black", this, position);
   } else if (i === 0 && j === 4) {
-    return new Chess.King("black", this, position);
+    return new King("black", this, position);
   } else if (i === 0 && j === 3) {
-    return new Chess.Queen("black", this, position);
+    return new Queen("black", this, position);
   } else if (i === 7 && (j === 7 || j === 0)) {
-    return new Chess.Rook("white", this, position);
+    return new Rook("white", this, position);
   } else if (i === 7 && (j === 6 || j === 1)) {
-    return new Chess.Knight("white", this, position);
+    return new Knight("white", this, position);
   } else if (i === 7 && (j === 5 || j === 2)) {
-    return new Chess.Bishop("white", this, position);
+    return new Bishop("white", this, position);
   } else if (i === 7 && j === 4) {
-    return new Chess.King("white", this, position);
+    return new King("white", this, position);
   } else if (i === 7 && j === 3) {
-    return new Chess.Queen("white", this, position);
+    return new Queen("white", this, position);
   } else {
     return null;
   }
