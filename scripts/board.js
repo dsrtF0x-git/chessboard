@@ -1,5 +1,17 @@
-import { Chess } from "./chess.js";
-import { Rook, Pawn, Bishop, Queen, King, Knight } from "./piece.js";
+import { King } from "./pieces/king.js";
+import {
+  boardSize,
+  topPlayerColor,
+  bottomPlayerColor,
+  whiteLeftSideRook,
+  whiteRightSideRook,
+  whiteKingCoordinates,
+  blackKingCoordinates,
+  blackRightSideRook,
+  blackLeftSideRook,
+  startPiecesLocation
+} from "./constants/config.js";
+import { Util } from "./util.js";
 
 export const Board = function(initGame) {
   this.moves = [];
@@ -9,21 +21,27 @@ export const Board = function(initGame) {
 
 Board.prototype.init = function() {
   this.grid = [];
-  for (let i = 0; i < 8; i++) {
+  for (let i = 0; i < boardSize; i++) {
     this.grid.push([]);
-    for (let j = 0; j < 8; j++) {
-      this.grid[i][j] = this.placePiece(this.blankBoard ? null : i, j);
+    for (let j = 0; j < boardSize; j++) {
+      this.grid[i][j] = this.blankBoard
+        ? null
+        : this.placePiece(i, j);
     }
   }
-}
+};
+
+Board.prototype.findKing = function(kingStartingCoordinates) {
+  return this.grid[kingStartingCoordinates.x][kingStartingCoordinates.y];
+};
 
 Board.prototype.move = function(startPosition, endPosition) {
-  const piece1 = this.grid[startPosition[0]][startPosition[1]],
-        piece2 = this.grid[endPosition[0]][endPosition[1]];
+  const piece1 = this.getPiece(startPosition),
+        piece2 = this.getPiece(endPosition);
 
   if (piece1.validMove(startPosition, endPosition)) {
     this.movePiece(piece1, piece2, startPosition, endPosition);
-    this.didKingCastle(piece1, startPosition);
+    this.isCastlingCondition(piece1, startPosition);
     return true;
   }
   return false;
@@ -37,24 +55,24 @@ Board.prototype.movePiece = function(piece1, piece2, startPosition, endPosition)
   this.moves.push([startPosition, endPosition, piece1, piece2]);
 };
 
-Board.prototype.didKingCastle = function(piece, lastPosition) {
+Board.prototype.isCastlingCondition = function(piece, lastPosition) {
   if (piece instanceof King && piece.didCastle(lastPosition)) {
-    this.findRook(piece, lastPosition);
+    this.findRook(piece);
   }
 };
 
 Board.prototype.findRook = function(king) {
-  if (king.color === "white") {
-    if (Chess.Util._arrayEquals(king.currentPosition, [7, 6])) {
-      this.moveRook([7, 7], [7, 5]);
-    } else if (Chess.Util._arrayEquals(king.currentPosition, [7, 2])) {
-      this.moveRook([7, 0], [7, 3]);
+  if (king.color === bottomPlayerColor) {
+    if (Util._arrayEquals(king.currentPosition, whiteKingCoordinates.rightCastlePos)) {
+      this.moveRook(whiteRightSideRook.startPos, whiteRightSideRook.afterCastlingPos);
+    } else if (Util._arrayEquals(king.currentPosition, whiteKingCoordinates.leftCastlePos)) {
+      this.moveRook(whiteLeftSideRook.startPos, whiteLeftSideRook.afterCastlingPos);
     }
-  } else if (king.color === "black") {
-    if (Chess.Util._arrayEquals(king.currentPosition, [0, 6])) {
-      this.moveRook([0, 7], [0, 5]);
-    } else if (Chess.Util._arrayEquals(king.currentPosition, [0, 2])) {
-      this.moveRook([0, 0], [0, 3]);
+  } else if (king.color === topPlayerColor) {
+    if (Util._arrayEquals(king.currentPosition, blackKingCoordinates.rightCastlePos)) {
+      this.moveRook(blackRightSideRook.startPos, blackRightSideRook.afterCastlingPos);
+    } else if (Util._arrayEquals(king.currentPosition, blackKingCoordinates.leftCastlePos)) {
+      this.moveRook(blackLeftSideRook.startPos, blackLeftSideRook.afterCastlingPos);
     }
   }
 };
@@ -65,52 +83,30 @@ Board.prototype.moveRook = function(startPosition, endPosition) {
 };
 
 Board.prototype.reverseLastMove = function() {
-  let lastMove = this.moves[this.moves.length - 1],
-      startPosition = lastMove[0],
-      endPosition = lastMove[1],
-      piece1 = lastMove[2],
-      piece2 = lastMove[3];
+  const [startPosition, endPosition, piece1, piece2] = this.moves.pop();
   piece1.moved--;
 
   this.grid[startPosition[0]][startPosition[1]] = piece1;
   piece1.currentPosition = startPosition;
 
   this.grid[endPosition[0]][endPosition[1]] = piece2;
-  if (piece2 !== null) piece2.currentPosition = endPosition;
-  this.moves.pop();
+  if (piece2 !== null) {
+    piece2.currentPosition = endPosition;
+  }
 };
 
-Board.prototype.getPiece = function(array) {
-  return this.grid[array[0]][array[1]];
+Board.prototype.isWayClear = function(coordinates) {
+  return this.getPiece(coordinates) === null;
+};
+
+Board.prototype.getPiece = function(coordinates) {
+  return this.grid[coordinates[0]][coordinates[1]];
 };
 
 Board.prototype.placePiece = function(i, j) {
   const position = [i, j];
-  if (i === 1) {
-    return new Pawn("black", this, position);
-  } else if (i === 6) {
-    return new Pawn("white", this, position);
-  } else if (i === 0 && (j === 0 || j === 7)) {
-    return new Rook("black", this, position);
-  } else if (i === 0 && (j === 1 || j === 6)) {
-    return new Knight("black", this, position);
-  } else if (i === 0 && (j === 2 || j === 5)) {
-    return new Bishop("black", this, position);
-  } else if (i === 0 && j === 4) {
-    return new King("black", this, position);
-  } else if (i === 0 && j === 3) {
-    return new Queen("black", this, position);
-  } else if (i === 7 && (j === 7 || j === 0)) {
-    return new Rook("white", this, position);
-  } else if (i === 7 && (j === 6 || j === 1)) {
-    return new Knight("white", this, position);
-  } else if (i === 7 && (j === 5 || j === 2)) {
-    return new Bishop("white", this, position);
-  } else if (i === 7 && j === 4) {
-    return new King("white", this, position);
-  } else if (i === 7 && j === 3) {
-    return new Queen("white", this, position);
-  } else {
-    return null;
-  }
+
+  const config = startPiecesLocation.get(position.join(""));
+
+  return config ? new config.piece(config.color, this, position) : null;
 };

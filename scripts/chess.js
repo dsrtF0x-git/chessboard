@@ -1,6 +1,7 @@
 import { Board } from "./board.js";
 import { Util } from "./util.js"
 import { Display } from "./display.js";
+import { topPlayerColor, bottomPlayerColor, blackKingCoordinates, whiteKingCoordinates } from "./constants/config.js";
 
 export const Chess = {
   newGame(initGame) {
@@ -8,25 +9,30 @@ export const Chess = {
     this.endPosition = null;
     this.board = new Board(initGame);
     this.display = new Display(this.board);
-    this.bKing = this.board.grid[0][4];
-    this.wKing = this.board.grid[7][4];
-    this.currentTurn = "white";
+    this.blackKing = this.board.findKing(blackKingCoordinates);
+    this.whiteKing = this.board.findKing(whiteKingCoordinates);
+    this.currentTurn = bottomPlayerColor;
   },
 
-  selectPosition(array) {
-    let piece = this.board.getPiece(array);
-    if (this.startPosition === null && piece !== null && piece.color === this.currentTurn) {
-      this.startPosition = array;
+  selectPosition(currentCoordinates) {
+    const isOnPieceClicked = (position, piece) => {
+      return position === null && piece !== null && piece.color === this.currentTurn;
+    }
+
+    let piece = this.board.getPiece(currentCoordinates);
+
+    if (isOnPieceClicked(this.startPosition, piece)) {
+      this.startPosition = currentCoordinates;
       piece.availableMoves();
-    } else if (Util._arrayEquals(this.startPosition, array)) {
+    } else if (Util._arrayEquals(this.startPosition, currentCoordinates)) {
       this.startPosition = null;
       this.moves = [];
       piece = null;
     } else if (this.startPosition !== null) {
-      this.endPosition = array;
+      this.endPosition = currentCoordinates;
       this.move(this.startPosition, this.endPosition);
       piece = null;
-      this.display.showMovesHistory(this.display.board.moves[this.display.board.moves.length - 1]);
+      this.display.showMovesHistory(Util._getLast(this.display.board.moves));
     }
     this.display.render(piece);
   },
@@ -35,7 +41,7 @@ export const Chess = {
     let endPiece = this.board.getPiece(endPosition);
     if (this.board.move(startPosition, endPosition)) {
       if (endPiece !== null && this.currentTurn !== endPiece.color) {
-        let king = endPiece.color === "black" ? this.wKing : this.bKing;
+        let king = endPiece.color === topPlayerColor ? this.whiteKing : this.blackKing;
         if (!king.inCheck()) {
           this.display.addBeatenPiece(endPiece);
         }
@@ -48,17 +54,15 @@ export const Chess = {
   },
 
   changeTurns() {
-    this.currentTurn = this.currentTurn === "white" ? "black" : "white";
-    [...document.querySelectorAll(".player-name")].forEach(item => {
-      item.classList.toggle("current-turn");
-    });
+    this.currentTurn = this.currentTurn === bottomPlayerColor ? topPlayerColor : bottomPlayerColor;
+    this.display.changeTurnIndicator();
   },
 
   reverseIfInCheck(callback) {
-    if (this.currentTurn === "white" && this.wKing.inCheck()) {
+    if (this.currentTurn === bottomPlayerColor && this.whiteKing.inCheck()) {
       this.board.reverseLastMove();
       return;
-    } else if (this.currentTurn === "black" && this.bKing.inCheck()) {
+    } else if (this.currentTurn === topPlayerColor && this.blackKing.inCheck()) {
       this.board.reverseLastMove();
       return;
     }
@@ -66,12 +70,12 @@ export const Chess = {
   },
 
   gameOver() {
-    if (this.currentTurn === "white") {
-      if (this.wKing.checkmate()) {
+    if (this.currentTurn === bottomPlayerColor) {
+      if (this.whiteKing.checkmate()) {
         this.display.showWinner(document.querySelectorAll(".player-name")[0].textContent);
       }
     } else {
-      if (this.bKing.checkmate()) {
+      if (this.blackKing.checkmate()) {
         this.display.showWinner(document.querySelectorAll(".player-name")[1].textContent);
       }
     }

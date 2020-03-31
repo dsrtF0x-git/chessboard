@@ -1,6 +1,7 @@
 import { Chess } from "./chess.js";
 import { Util } from "./util.js";
-import { Pawn } from "./piece.js";
+import { Pawn } from "./pieces/pawn.js";
+import { piecesImage } from "./constants/config.js";
 
 export const Display = function(board) {
   this.board = board;
@@ -17,13 +18,15 @@ export const Display = function(board) {
 };
 
 Display.prototype.render = function(selectedPiece) {
-  this.empty();
+  this.clearBoard();
   for (let i = 0; i < this.board.grid.length; i++) {
     for (let j = 0; j < this.board.grid[i].length; j++) {
       this.appendSquare(i, j, this.board.grid[i][j], selectedPiece);
     }
   }
-  if (this.currentState === this.states.End) this.gameOver(this.winner);
+  if (this.currentState === this.states.End) {
+    this.gameOver(this.winner);
+  }
 };
 
 Display.prototype.clearMovesHistory = function() {
@@ -37,7 +40,7 @@ Display.prototype.clearMovesHistory = function() {
   logTable.innerHTML = ``;
 };
 
-Display.prototype.empty = function() {
+Display.prototype.clearBoard = function() {
   while(this.chessBoard.firstChild) {
     this.chessBoard.removeChild(this.chessBoard.firstChild);
   }
@@ -46,7 +49,9 @@ Display.prototype.empty = function() {
 Display.prototype.appendSquare = function(i, j, piece, selectedPiece) {
   const square = document.createElement("div");
 
-  if (piece instanceof Pawn) piece.promotion();
+  if (piece instanceof Pawn) {
+    piece.promotion();
+  }
 
   if (selectedPiece !== null && Util._includesSubArray(selectedPiece.moves, [i, j])) {
     square.className = "possibleMove";
@@ -58,7 +63,10 @@ Display.prototype.appendSquare = function(i, j, piece, selectedPiece) {
 
   square.id = `[${i},${j}]`;
 
-  if (piece !== null) square.innerHTML = piece.show;
+  if (piece !== null) {
+    const pieceImage = piecesImage.get(`${piece.color}${piece.name}`);
+    square.innerHTML = pieceImage;
+  }
 
   if (Chess.startPosition !== null && Chess.startPosition[0] === i && Chess.startPosition[1] === j) {
     square.classList.add("selected-piece");
@@ -72,11 +80,19 @@ Display.prototype.appendSquare = function(i, j, piece, selectedPiece) {
 };
 
 Display.prototype.addBeatenPiece = function(piece) {
-  if (piece === null) return;
+  if (piece === null) {
+    return;
+  }
   const blacksTrophies = document.querySelectorAll(".beaten-pieces")[0];
   const whiteTrophies = document.querySelectorAll(".beaten-pieces")[1];
   piece.color === "white" ? blacksTrophies.innerHTML += `${piece.icon}` : whiteTrophies.innerHTML += `${piece.icon}`;
-}
+};
+
+Display.prototype.changeTurnIndicator = function() {
+  [...document.querySelectorAll(".player-name")].forEach(item => {
+    item.classList.toggle("current-turn");
+  });
+};
 
 Display.prototype.showMovesHistory = function(lastMove) {
   const logGameTable = document.querySelector(".logs");
@@ -102,11 +118,9 @@ Display.prototype.showMovesHistory = function(lastMove) {
 }
 
 Display.prototype.pawnPromotion = function(piece) {
-  // const modalBg = document.createElement("div");
   const modal = document.createElement("div");
   const question = document.createElement("p");
 
-  // modalBg.className = "chessboard-modal-bg";
   modal.className = "chessboard-modal";
   question.className = "modal-question";
 
@@ -118,7 +132,6 @@ Display.prototype.pawnPromotion = function(piece) {
   this.generateButton(piece, "Bishop", modal);
   this.generateButton(piece, "Knight", modal);
 
-  // this.chessBoard.appendChild(modalBg);
   this.chessBoard.appendChild(modal);
 };
 
@@ -172,20 +185,6 @@ Display.prototype.generateButton = function(piece, choice, element) {
   choosePiece.textContent = choice;
   choosePiece.className = "piece-select";
 
-  switch(choice) {
-    case "Queen":
-      choosePiece.onclick = piece.toQueen.bind(piece);
-      break;
-    case "Bishop":
-      choosePiece.onclick = piece.toBishop.bind(piece);
-      break;
-    case "Knight":
-      choosePiece.onclick = piece.toKnight.bind(piece);
-      break;
-    case "Rook":
-      choosePiece.onclick = piece.toRook.bind(piece);
-      break;
-  }
-
+  choosePiece.onclick = piece.promoteTo.bind(piece, choice);
   element.appendChild(choosePiece);
 }
