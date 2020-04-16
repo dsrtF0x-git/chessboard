@@ -1,14 +1,24 @@
 import { linkPrototype, Piece } from "./piece.js";
 import { Util } from "../util.js";
-import { Chess } from "../chess.js";
+import { topPlayerColor, bottomPlayerColor, moveDirections } from "../constants/config.js";
 
 export const King = function(color, board, position) {
   this.init(color, board, position);
   this.name = "King";
-  this.icon = "♔";
 };
 
 linkPrototype(King);
+
+King.prototype.findEnemyKing = function(color) {
+  for (let i = 0; i < this.board.grid.length; i++) {
+    for (let j = 0; j < this.board.grid[i].length; j++) {
+      const piece = this.board.grid[i][j];
+      if (piece !== null && piece.name === "King" && piece.color !== color) {
+        return piece;
+      } 
+    }
+  }
+};
 
 King.prototype.validMove = function(startPosition, endPosition) {
   const [ startPositionX, startPositionY ] = startPosition;
@@ -18,13 +28,19 @@ King.prototype.validMove = function(startPosition, endPosition) {
     return true;
   }
 
-  if (Math.abs(endPositionX - startPositionX) < 2 && Math.abs(endPositionY - startPositionY) < 2) {
-    const enemyKing = this.color === "white" ? Chess.blackKing : Chess.whiteKing;
-    let enemyKingPositionX = enemyKing.currentPosition[0],
-        enemyKingPositionY = enemyKing.currentPosition[1];
-    if (Math.abs(endPositionX - enemyKingPositionX) <= 1 && Math.abs(endPositionY - enemyKingPositionY) <= 1) {
-      return false;
+  const isEnemyKingClose = (fromX, fromY, toX, toY) => {
+    if (Math.abs(toX - fromX) < 2 && Math.abs(toY - fromY) < 2) {
+      const enemyKing = this.findEnemyKing(this.color);
+      const [ enemyKingPositionX, enemyKingPositionY ] = enemyKing.currentPosition;
+      if (Math.abs(toX - enemyKingPositionX) <= 1 && Math.abs(toY - enemyKingPositionY) <= 1) {
+        return false;
+      }
+      return true;
     }
+    return false;
+  }
+
+  if (isEnemyKingClose(startPositionX, startPositionY, endPositionX, endPositionY)) {
     return Piece.prototype.validMove.call(this, startPosition, endPosition);
   }
   return false;
@@ -75,63 +91,68 @@ King.prototype.inCheck = function(position) {
   return false;
 };
 
-King.prototype.canWhiteKingDidCastle = function(lastPosition) {
-  return Util._arrayEquals(lastPosition, [7, 4]) &&
-         (Util._arrayEquals(this.currentPosition, [7, 6]) || 
-          Util._arrayEquals(this.currentPosition, [7, 2]));
-};
-
-King.prototype.canBlackKingDidCastle = function(lastPosition) {
-  return Util._arrayEquals(lastPosition, [0, 4]) &&
-         (Util._arrayEquals(this.currentPosition, [0, 6]) ||
-          Util._arrayEquals(this.currentPosition, [0, 2]));
-
-}
-
 King.prototype.didCastle = function(lastPosition) {
+
+  const canWhiteKingDidCastle = position => {
+    return Util._arrayEquals(position, [7, 4]) &&
+           (Util._arrayEquals(this.currentPosition, [7, 6]) || 
+           Util._arrayEquals(this.currentPosition, [7, 2]));
+  }
+
+  const canBlackKingDidCastle = position => {
+    return Util._arrayEquals(position, [0, 4]) &&
+           (Util._arrayEquals(this.currentPosition, [0, 6]) ||
+           Util._arrayEquals(this.currentPosition, [0, 2]));
+  }
+
   if (this.moved === 1) {
-    return this.canWhiteKingDidCastle(lastPosition) || this.canBlackKingDidCastle(lastPosition);
+    switch (this.color) {
+      case bottomPlayerColor: return canWhiteKingDidCastle(lastPosition);
+      case topPlayerColor: return canBlackKingDidCastle(lastPosition);
+      default: return false;
+    }
   }
 };
 
 King.prototype.checkIfCastleMove = function(endPosition) {
-  const castlingDirection = this.castlingDirection();
-  if (this.color === "white" && Util._arrayEquals(endPosition, [7, 2]) && castlingDirection[0]) {
-    return true;
-  } else if (this.color === "white" && Util._arrayEquals(endPosition, [7, 6]) && castlingDirection[1]) {
-    return true;
-  } else if (this.color === "black" && Util._arrayEquals(endPosition, [0, 2]) && castlingDirection[0]) {
-    return true;
-  } else if (this.color === "black" && Util._arrayEquals(endPosition, [0, 6]) && castlingDirection[1]) {
-    return true;
+  const [castlingDirectionX, castlingDirectionY] = this.castlingDirection();
+  if (this.color === bottomPlayerColor) {
+    return (
+      (Util._arrayEquals(endPosition, [7, 2]) && castlingDirectionX) ||
+      (Util._arrayEquals(endPosition, [7, 6]) && castlingDirectionY)
+    );
+  } else if (this.color === topPlayerColor) {
+    return (
+      (Util._arrayEquals(endPosition, [0, 2]) && castlingDirectionX) ||
+      (Util._arrayEquals(endPosition, [0, 6]) && castlingDirectionY)
+    );
   }
-  return false;
 };
 
 King.prototype.castlingDirection = function() {
   const [ rook1, rook2 ] = this.getRooks();
 
   return [ 
-          (this.canCastle(rook1) && this.castlingCollisionCheck("left")),
-          (this.canCastle(rook2) && this.castlingCollisionCheck("right")),
+          (this.canCastle(rook1) && this.castlingCollisionCheck(moveDirections.left)),
+          (this.canCastle(rook2) && this.castlingCollisionCheck(moveDirections.right)),
         ];
 };
 
 King.prototype.castlingCollisionCheck = function(direction) {
   for (let i = 0; i < 2; i++) {
-    if (this.color === "white" && direction === "left") {
+    if (this.color === bottomPlayerColor && direction === moveDirections.left) {
       if (this.board.getPiece([7, 3 - i]) !== null || this.inCheck([7, 3 - i])) {
         return false;
       }
-    } else if (this.color === "white" && direction === "right") {
+    } else if (this.color === bottomPlayerColor && direction === moveDirections.right) {
       if (this.board.getPiece([7, 5 + i]) !== null || this.inCheck([7, 5 + i])) {
         return false;
       }
-    } else if (this.color === "black" && direction === "right") {
+    } else if (this.color === topPlayerColor && direction === moveDirections.right) {
       if (this.board.getPiece([0, 5 + i]) !== null || this.inCheck([0, 5 + i])) {
         return false;
       }
-    } else if (this.color === "black" && direction === "left") {
+    } else if (this.color === topPlayerColor && direction === moveDirections.left) {
       if (this.board.getPiece([0, 3 - i]) !== null || this.inCheck([0, 3 - i])) {
         return false;
       }
@@ -150,9 +171,9 @@ King.prototype.canCastle = function(rook) {
 };
 
 King.prototype.getRooks = function() {
-  if (this.color === "white") {
+  if (this.color === bottomPlayerColor) {
     return [this.board.getPiece([7, 0]), this.board.getPiece([7, 7])];
-  } else if (this.color === "black") {
+  } else if (this.color === topPlayerColor) {
     return [this.board.getPiece([0, 0]), this.board.getPiece([0, 7])];
   }
 };

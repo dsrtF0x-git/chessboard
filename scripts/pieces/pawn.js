@@ -1,11 +1,21 @@
 import { Piece, linkPrototype } from "./piece.js";
-import { topPlayerColor, bottomPlayerColor, pawnPromotionsList } from "../constants/config.js"
-import { Chess } from "../chess.js";
+import { topPlayerColor, bottomPlayerColor } from "../constants/config.js"
+import { browserCurrentGame, isBrowser } from "../index.js";
+import { Queen } from "./queen.js";
+import { Bishop } from "./bishop.js";
+import { Rook } from "./rook.js";
+import { Knight } from "./knight.js";
+
+const pawnPromotionsList = new Map([
+  ["Queen", {piece: Queen}],
+  ["Knight", {piece: Knight}],
+  ["Rook", {piece: Rook}],
+  ["Bishop", {piece: Bishop}],
+]);
 
 export const Pawn = function(color, board, position) {
   this.init(color, board, position);
   this.name = "Pawn";
-  this.icon = "♙";
 };
 
 linkPrototype(Pawn);
@@ -53,17 +63,42 @@ Pawn.prototype.validMove = function(startPosition, endPosition) {
   }
 };
 
-Pawn.prototype.promotion = function() {
+Pawn.prototype.promotion = function(toPiece) {
   if (this.color === bottomPlayerColor && this.currentPosition[0] === 0) {
-    Chess.display.pawnPromotion(this);
+    if (isBrowser) {
+      browserCurrentGame.display.pawnPromotion(this);
+    } else {
+      if (!toPiece) {
+        return true;
+      } else {
+        const desirablePiece = pawnPromotionsList.get(toPiece);
+        return this.promoteTo(desirablePiece.piece);   
+      }
+    }
   } else if (this.color === topPlayerColor && this.currentPosition[0] === 7) {
-    Chess.display.pawnPromotion(this);
+    if (isBrowser) {
+      browserCurrentGame.display.pawnPromotion(this);
+    } else {
+      if (!toPiece) {
+        return true;
+      } else {
+        const desirablePiece = pawnPromotionsList.get(toPiece);
+        return this.promoteTo(desirablePiece.piece);
+      }
+    }
   }
 };
 
 Pawn.prototype.promoteTo = function(promoteToPiece) {
   const [ positionX, positionY ] = this.currentPosition;
-  const pawnAfterPromote = pawnPromotionsList.get(promoteToPiece);
-  this.board.grid[positionX][positionY] = new pawnAfterPromote.piece(this.color, this.board, this.currentPosition);
-  Chess.display.clearPromotion();
+  let pawnAfterPromote;
+  if (isBrowser) {
+    pawnAfterPromote = pawnPromotionsList.get(promoteToPiece);
+    this.board.grid[positionX][positionY] = new pawnAfterPromote.piece(this.color, this.board, this.currentPosition);
+    browserCurrentGame.display.clearPromotion()
+  } else {
+    pawnAfterPromote = new promoteToPiece(this.color, this.board, this.currentPosition);
+    this.board.grid[positionX][positionY] = pawnAfterPromote;
+    return pawnAfterPromote;
+  }
 };

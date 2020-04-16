@@ -13,6 +13,13 @@ export const Util = {
     return `${moveToColumn[fromY]}${moveToRow[fromX]}:${moveToColumn[toY]}${moveToRow[toX]}`;
   },
 
+  _convertToNumbersCoordinate(coordinateString) {
+    const [ column, row ] = coordinateString.split("");
+    const moveToRow = ["8", "7", "6", "5", "4", "3", "2", "1"];
+    const moveToColumn = ["a", "b", "c", "d", "e", "f", "g", "h"];
+    return [moveToRow.indexOf(row), moveToColumn.indexOf(column)];
+  },
+
   _getLast(array) {
     return array[array.length - 1];
   },

@@ -1,13 +1,4 @@
-const moveDirections = {
-  up: "up",
-  down: "down",
-  left: "left",
-  right: "right",
-  upright: "upright",
-  upleft: "upleft",
-  downright: "downright",
-  downleft: "downleft"
-};
+import { moveDirections } from "../constants/config.js";
 
 export const linkPrototype = function(child) {
   child.prototype = Object.create(Piece.prototype);
@@ -46,7 +37,7 @@ Piece.prototype.validMove = function(startPosition, endPosition) {
   if (this.board.getPiece(startPosition).name === "Knight") {
     return true;
   }
-  if (this.collisionCheck(startPosition, endPosition) === false) {
+  if (!this.collisionCheck(startPosition, endPosition)) {
     return false;
   }
   return true;

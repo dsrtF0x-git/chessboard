@@ -1,7 +1,6 @@
-import { Chess } from "./chess.js";
 import { Util } from "./util.js";
 import { Pawn } from "./pieces/pawn.js";
-import { piecesImage } from "./constants/config.js";
+import { piecesImage, bottomPlayerColor, topPlayerColor, pieceIcons } from "./constants/config.js";
 
 export const Display = function(board) {
   this.board = board;
@@ -17,11 +16,11 @@ export const Display = function(board) {
   this.addPlayersName();
 };
 
-Display.prototype.render = function(selectedPiece) {
+Display.prototype.render = function(selectedPiece, startPosition) {
   this.clearBoard();
   for (let i = 0; i < this.board.grid.length; i++) {
     for (let j = 0; j < this.board.grid[i].length; j++) {
-      this.appendSquare(i, j, this.board.grid[i][j], selectedPiece);
+      this.appendSquare(i, j, this.board.grid[i][j], selectedPiece, startPosition);
     }
   }
   if (this.currentState === this.states.End) {
@@ -46,9 +45,8 @@ Display.prototype.clearBoard = function() {
   }
 };
 
-Display.prototype.appendSquare = function(i, j, piece, selectedPiece) {
+Display.prototype.appendSquare = function(i, j, piece, selectedPiece, startPosition = []) {
   const square = document.createElement("div");
-
   if (piece instanceof Pawn) {
     piece.promotion();
   }
@@ -56,36 +54,37 @@ Display.prototype.appendSquare = function(i, j, piece, selectedPiece) {
   if (selectedPiece !== null && Util._includesSubArray(selectedPiece.moves, [i, j])) {
     square.className = "possibleMove";
   } else if ((i + j) % 2 === 0) {
-    square.className = "white";
+    square.className = "white square";
   } else {
-    square.className = "brown";
+    square.className = "brown square";
   }
 
   square.id = `[${i},${j}]`;
 
   if (piece !== null) {
-    const pieceImage = piecesImage.get(`${piece.color}${piece.name}`);
-    square.innerHTML = pieceImage;
+    const pieceImagePath = piecesImage.get(`${piece.color}${piece.name}`);
+    square.innerHTML = `<div><img src='${pieceImagePath}'></div>`;
   }
 
-  if (Chess.startPosition !== null && Chess.startPosition[0] === i && Chess.startPosition[1] === j) {
+  if (startPosition !== null && startPosition[0] === i && startPosition[1] === j) {
     square.classList.add("selected-piece");
   }
-
-  square.addEventListener("click", () => {
-    Chess.selectPosition(JSON.parse(square.id));
-  });
 
   this.chessBoard.appendChild(square);
 };
 
-Display.prototype.addBeatenPiece = function(piece) {
+Display.prototype.addBeatenPiece = function (piece) {
   if (piece === null) {
     return;
   }
-  const blacksTrophies = document.querySelectorAll(".beaten-pieces")[0];
-  const whiteTrophies = document.querySelectorAll(".beaten-pieces")[1];
-  piece.color === "white" ? blacksTrophies.innerHTML += `${piece.icon}` : whiteTrophies.innerHTML += `${piece.icon}`;
+  const [blacksTrophies, whiteTrophies] = document.querySelectorAll(".beaten-pieces");
+  piece.color === bottomPlayerColor
+    ? (blacksTrophies.innerHTML += `${pieceIcons.get(
+        piece.color + piece.name
+      )}`)
+    : (whiteTrophies.innerHTML += `${pieceIcons.get(
+        piece.color + piece.name
+      )}`);
 };
 
 Display.prototype.changeTurnIndicator = function() {
@@ -115,7 +114,7 @@ Display.prototype.showMovesHistory = function(lastMove) {
     };
   }
   logGameTable.innerHTML += tableRow;
-}
+};
 
 Display.prototype.pawnPromotion = function(piece) {
   const modal = document.createElement("div");
@@ -126,7 +125,7 @@ Display.prototype.pawnPromotion = function(piece) {
 
   question.textContent = "Choose piece";
   modal.appendChild(question);
-
+  
   this.generateButton(piece, "Queen", modal);
   this.generateButton(piece, "Rook", modal);
   this.generateButton(piece, "Bishop", modal);
@@ -140,8 +139,8 @@ Display.prototype.clearPromotion = function() {
 };
 
 Display.prototype.addPlayersName = function() {
-  const blackPlayer = document.getElementsByClassName("player-name")[0];
-  const whitePlayer = document.getElementsByClassName("player-name")[1];
+  const [ blackPlayer, whitePlayer ] = document.getElementsByClassName("player-name");
+  
   const inputForBlackPlayer = document.querySelectorAll(".player-name-input")[0];
   inputForBlackPlayer.addEventListener("input", event => {
     blackPlayer.textContent = event.target.value || "Black";
@@ -153,30 +152,22 @@ Display.prototype.addPlayersName = function() {
 };
 
 Display.prototype.gameOver = function(color) {
-  const modalBg = document.createElement("div");
-  const modal = document.createElement("div");
-  const question = document.createElement("p");
-  const newGameButton = document.createElement("button");
+  const modal = document.querySelector(".endgame-modal");
+  const question = document.querySelector(".endgame-message");
 
-  modalBg.className = "chessboard-modal-bg";
-  modal.className = "chessboard-modal";
-  question.className = "modal-question";
+  modal.style.display = "flex";
 
   question.textContent = `Checkmate, ${color} won!`;
-
-  modal.appendChild(question);
-  newGameButton.innerHTML = "New game";
-  newGameButton.onclick = Chess.newGame.bind(Chess);
-
-  modal.appendChild(newGameButton);
-  
-  this.chessBoard.appendChild(modalBg);
-  this.chessBoard.appendChild(modal);
 };
 
 Display.prototype.showWinner = function(color) {
   this.currentState = this.states.End;
-  this.winner = color;
+  const [ topPlayerName, bottomPlayerName ] = [...document.querySelectorAll(".player-name")];
+  switch(color) {
+    case bottomPlayerColor: this.winner = topPlayerName.textContent; break;
+    case topPlayerColor: this.winner = bottomPlayerName.textContent; break;
+    default: this.winner = "Draw";
+  }
 };
 
 Display.prototype.generateButton = function(piece, choice, element) {
@@ -187,4 +178,4 @@ Display.prototype.generateButton = function(piece, choice, element) {
 
   choosePiece.onclick = piece.promoteTo.bind(piece, choice);
   element.appendChild(choosePiece);
-}
+};

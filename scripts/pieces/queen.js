@@ -3,7 +3,6 @@ import { linkPrototype, Piece } from "./piece.js";
 export const Queen = function(color, board, position) {
   this.init(color, board, position);
   this.name = "Queen";
-  this.icon = "♕";
 };
 
 linkPrototype(Queen);
