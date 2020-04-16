@@ -95,6 +95,28 @@ body {
   height: 700px;
   justify-content: space-between;
 }
+.board-container .endgame-modal {
+  width: 605px;
+  height: 605px;
+  position: absolute;
+  top: 60px;
+  background-color: #b8e994;
+  display: none;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+.board-container .endgame-modal .endgame-message {
+  text-align: center;
+  font-size: 24px;
+}
+.board-container .endgame-modal .try-one-more {
+  width: 120px;
+  height: 40px;
+  border: 1px solid white;
+  border-radius: 10px;
+  outline: none;
+}
 .board-container .player-info {
   width: 600px;
   display: flex;

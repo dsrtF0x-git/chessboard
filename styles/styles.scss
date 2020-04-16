@@ -134,6 +134,31 @@ body {
   height: 700px;
   justify-content: space-between;
 
+  .endgame-modal {
+    width: $chess-board-size + 5px;
+    height: $chess-board-size + 5px;
+    position: absolute;
+    top: $chess-board-size / 10;
+    background-color: #b8e994;
+    display: none;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+
+    & .endgame-message {
+      text-align: center;
+      font-size: 24px;
+    }
+
+    & .try-one-more {
+      width: $chess-board-size / 5;
+      height: 40px;
+      border: 1px solid white;
+      border-radius: 10px;
+      outline: none;
+    }
+  }
+
   .player-info {
     width: $chess-board-size;
     display: flex;
@@ -203,7 +228,7 @@ body {
         width: 100px;
         margin: 5px;
       }
-    }
+    }    
 
     .possibleMove, .brown, .white {
       text-align: center;
