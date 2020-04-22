@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chess Game</title>
+  <link rel="stylesheet" href="styles/styles.css">
+  <script defer type="module" src="scripts/index.js"></script>
+</head>
+<body>
+  <div class="wrapper">
+    <div class="board-container">
+      <div class="player-info">
+        <input class="player-name-input" type="text" placeholder="Enter your name">
+        <p class="beaten-pieces removed-white"></p>
+        <span class="player-name">Black</span>
+      </div>
+      <div class="chessboard" id="chessboard"></div>
+      <div class="endgame-modal">
+        <p class="endgame-message">Lorem ipsum dolor sit.</p>
+        <button class="try-one-more">Try again</button>
+      </div>
+      <div class="player-info">
+        <input class="player-name-input" type="text" placeholder="Enter your name">
+        <p class="beaten-pieces removed-black"></p>
+        <span class="player-name current-turn">White</span>
+      </div>
+    </div>
+    <div class="game-log">
+      <div class="control-buttons">
+        <button id="start-game">Start new game</button>
+        <button id="restart-game">Restart game</button>
+      </div>
+      <p>Game log</p>
+      <div>
+        <table>
+          <thead>
+            <tr>
+              <td>#</td>
+              <td>Color</td>
+              <td>Piece</td>
+              <td>From</td>
+              <td>To</td>
+            </tr>
+          </thead>
+          <tbody class="logs"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</body>
+</html>
