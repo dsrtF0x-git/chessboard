@@ -50,3 +50,17 @@ export const environments = {
   node: "process",
   browser: "window"
 };
+export const commands = {
+  save: {
+    hostname: "localhost",
+    port: 4444,
+    path: "/save-state",
+    method: "POST",
+  },
+  load: {
+    hostname: "localhost",
+    port: 4444,
+    path: "/load-state",
+    method: "GET",
+  },
+};
