@@ -1,15 +1,13 @@
 {
-  "name": "chess",
+  "name": "tests",
   "version": "1.0.0",
   "description": "",
-  "main": "chess.js",
+  "main": "bishop.test.js",
   "type": "module",
   "scripts": {
     "test": "jest"
   },
+  "keywords": [],
   "author": "",
-  "license": "ISC",
-  "dependencies": {
-    "jest": "^26.0.1"
-  }
+  "license": "ISC"
 }

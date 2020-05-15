@@ -1,6 +1,6 @@
 import { Piece, linkPrototype } from "./piece.js";
 import { topPlayerColor, bottomPlayerColor, environments } from "../constants/config.js"
-import { browserCurrentGame } from "../index.js";
+import { browserCurrentGame } from "../browserLauncher.js";
 import { env } from "../helpers/determine-environment.js";
 import { Queen } from "./queen.js";
 import { Bishop } from "./bishop.js";

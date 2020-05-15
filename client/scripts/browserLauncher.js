@@ -2,7 +2,7 @@ import { Chess } from "./chess.js";
 import { Util } from "./helpers/util.js";
 import { BASE_URL, topPlayerColor, bottomPlayerColor } from "./constants/config.js";
 
-let browserCurrentGame;
+export let browserCurrentGame;
 
 export function launchBrowserGame(isFirstGameSetup) {
   document.addEventListener("DOMContentLoaded", () => {
